@@ -13,6 +13,7 @@
         <link href="css/styles.css" rel="stylesheet" />
         <link href="{% static 'blog/bootstrap/bootstrap.min.css' %}" rel="stylesheet" type="text/css" media="screen">
         <link href="{% static 'blog/css/blog-post.css' %}" rel="stylesheet" type="text/css" media="screen">
+        <script src="https://kit.fontawesome.com/6b90979e00.js" crossorigin="anonymous"></script>
     </head>
     <body>
         <!-- Responsive navbar-->
@@ -40,17 +41,35 @@
                         <header class="mb-4">
                             <!-- Post title-->
                             <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
+                            <h5 class=""text_muted"> {{ post.hook_text }} </h5>
                             <!-- Post meta content-->
-                            <div class="text-muted fst-italic mb-2">Posted on {{ post.created_at }}1 by 작성자(개발 예정)</div>
+                            <div class="text-muted fst-italic mb-2">Posted on {{ post.created_at | date:"yy-m-d h:m:s "}}1 by 작성자(개발 예정)</div>
                             <!-- Post categories-->
                             <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a>
                             <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a>
                         </header>
                         <!-- Preview image figure-->
-                        <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="..." /></figure>
+                        {% if post.head_image %}
+                            <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="{{post.title}}의 head image" /></figure>
+                        {% else %}
+                            <figure class="mb-4"><img class="img-fluid rounded" src="https://picsum.photos/seed/{{post.id}}/800/200" als=randomimage" /></figure>
+                        {% endif %}
                         <!-- Post content-->
                         <section class="mb-5">
                             <p> {{ post.content }} </p>
+                            {% if post.file_upload %}
+                                <a href="{{post.file_upload.url}}" role="button" class="btn btn-outline-dark" download>
+                                    Download :
+                                    {% if post.get_file_ext == 'xlsx' or post.get_file_ext == 'xls' %}
+                                        <i class="fas fa-file-excel"></i>
+                                    {% elif post.get_file_ext == 'docx' or post.get_file_ext == 'doc' %}
+                                        <i class="fas fa-file-word"></i>
+                                    {% else %}
+                                        <i class="fas fa-file"></i>
+                                    {% endif %}
+                                    {{ post.get_file_name }}
+                                </a>
+                            {% endif %}
                         </section>
                     </article>
                     <!-- Comments section-->
