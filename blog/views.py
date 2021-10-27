@@ -24,7 +24,7 @@ class PostDetail(DetailView):
 #                  )
 #
 #def single_post_page(request, pk) :
-#    post = Post.objects.get(pk=pk)
+#    post = Post.objects.get(pk=pk) -> 괄호속 조건을 만족하는 레코드를 가져와리/ 매개변수 pk= post pk인 경우
 #
 #    return render(request, 'blog/post_detail.html',
 #                 {
