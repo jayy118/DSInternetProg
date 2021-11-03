@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from django.test import TestCase, Client
-from .models import Post, Category
+from .models import Post, Category, Tag
 from django.contrib.auth.models import User
 
 # Create your tests here.
@@ -13,13 +13,18 @@ class TestView(TestCase):
         self.category_programming = Category.objects.create(name='programming',slug='programming')
         self.category_culture = Category.objects.create(name='culture', slug='culture')
 
-        # 포스트(게시물)이 3개 존재하는 경우
+        self.tag_python_kor = Tag.objects.create(name='파이썬 공부', slug='파이썬-공부')
+        self.tag_python = Tag.objects.create(name='python', slug='python')
+        self.tag_hello = Tag.objects.create(name='hello', slug='hello')
+
+       # 포스트(게시물)이 3개 존재하는 경우
         self.post_001 = Post.objects.create(
             title = '첫 번째 포스트입니다.',
             content = "Hello World!!! We are the world...",
             author = self.user_james,
             category=self.category_programming,
         )
+        self.post_001.tags.add(self.tag_hello)
         self.post_002 = Post.objects.create(
             title='두 번째 포스트입니다.',
             content="1등이 전부가 아니잖아요",
@@ -31,6 +36,8 @@ class TestView(TestCase):
             content="세 번째 포스트입니다.",
             author=self.user_trump,
         )
+        self.post_003.tags.add(self.tag_python_kor)
+        self.post_003.tags.add(self.tag_python)
 
     def navbar_test(self, soup):
         # 네비게이션바가 있다
@@ -65,6 +72,22 @@ class TestView(TestCase):
         self.assertNotIn(self.post_002.title, main_area.text)
         self.assertNotIn(self.post_003.title, main_area.text)
 
+    def test_tag_page(self):
+        # 태그 페이지 url로 불러오기
+        response = self.client.get(self.tag_hello.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        # beautifulsoup4로 html을 parser하기
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.navbar_test(soup)
+        self.category_test(soup)
+        # 카테고리 name을 포함하고 있는지
+        self.assertIn(self.tag_hello.name, soup.h1.text)
+        # 카테고리에 포함된 post만 포함하고 있는지
+        main_area = soup.find('div', id="main-area")
+        self.assertIn(self.tag_hello.name, main_area.text)
+        self.assertIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertNotIn(self.post_003.title, main_area.text)
 
     def category_test(self, soup):
         category = soup.find('div', id='categories-card')
@@ -94,14 +117,23 @@ class TestView(TestCase):
         post_001_card = main_area.find('div', id='post-1')
         self.assertIn(self.post_001.title, post_001_card.text)
         self.assertIn(self.post_001.category.name, post_001_card.text)
+        self.assertIn(self.tag_hello.name, post_001_card.text)
+        self.assertNotIn(self.tag_python_kor.name, post_001_card.text)
+        self.assertNotIn(self.tag_python.name, post_001_card.text)
 
         post_002_card = main_area.find('div', id='post-2')
         self.assertIn(self.post_002.title, post_002_card.text)
         self.assertIn(self.post_002.category.name, post_002_card.text)
+        self.assertNotIn(self.tag_hello.name, post_002_card.text)
+        self.assertNotIn(self.tag_python_kor.name, post_002_card.text)
+        self.assertNotIn(self.tag_python.name, post_002_card.text)
 
         post_003_card = main_area.find('div', id='post-3')
         self.assertIn(self.post_003.title, post_003_card.text)
         self.assertIn('미분류', post_003_card.text)
+        self.assertNotIn(self.tag_hello.name, post_003_card.text)
+        self.assertIn(self.tag_python_kor.name, post_003_card.text)
+        self.assertIn(self.tag_python.name, post_003_card.text)
 
         self.assertIn(self.user_james.username.upper(), main_area.text)
         self.assertIn(self.user_trump.username.upper(), main_area.text)
@@ -139,6 +171,10 @@ class TestView(TestCase):
         post_area = main_area.find('div', id='post-area')
         self.assertIn(self.post_001.title, post_area.text)
         self.assertIn(self.post_001.category.name, post_area.text)
+        self.assertIn(self.tag_hello.name, post_area.text)
+        self.assertNotIn(self.tag_python.name, post_area.text)
+        self.assertNotIn(self.tag_python_kor.name, post_area.text)
+
         # 포스트 작성자가 있는가
         self.assertIn(self.user_james.username.upper(), post_area.text)
         # 포스트 내용이 있는가
