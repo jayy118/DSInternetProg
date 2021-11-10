@@ -23,6 +23,7 @@ urlpatterns = [
     path('blog/', include('blog.urls')), # 서버IP/blog -> blog 앱에 urls.py 생성
     path('admin/', admin.site.urls),  # 서버IP/admin
     path('', include('single_pages.urls')), # 서버IP/
+    path('markdownx/', include('markdownx.urls'))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
