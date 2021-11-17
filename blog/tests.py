@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from django.test import TestCase, Client
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 from django.contrib.auth.models import User
 
 # Create your tests here.
@@ -40,6 +40,12 @@ class TestView(TestCase):
         )
         self.post_003.tags.add(self.tag_python_kor)
         self.post_003.tags.add(self.tag_python)
+
+        self.comment_001 = Comment.objects.create(
+            post = self.post_001,
+            author = self.user_trump,
+            content = "첫번째 댓글입니다."
+        )
 
     def navbar_test(self, soup):
         # 네비게이션바가 있다
@@ -265,3 +271,8 @@ class TestView(TestCase):
         # 포스트 내용이 있는가
 
         self.assertIn(self.post_001.content, post_area.text)
+
+        comments_area = soup.find('div', id='comment-area')
+        comments_001_area = comments_area.find('div', id='comment-1')
+        self.assertIn(self.comment_001.author.username, comments_001_area.text)
+        self.assertIn(self.comment_001.content, comments_001_area.text)
