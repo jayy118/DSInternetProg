@@ -19,7 +19,7 @@
             {% if p.head_image %}
                 <img class="card-img-top" src=" {{ p.head_image.url }}" alt="{{p}}의 head image" />
             {% else %}
-                <image class="card-img-top" src="https://picsum.photos/seed/{{p.id}}/800/200" als=randomimage"/>
+                <img class="card-img-top" src="https://picsum.photos/seed/{{p.id}}/800/200" als=randomimage"/>
             {% endif %}
           <div class="card-body">
               {% if p.category %}
@@ -57,5 +57,4 @@
             <li class="page-item"><a class="page-link" href="#!">Older &rarr;</a></li>
         </ul>
 
-      </div>
 {% endblock %}
