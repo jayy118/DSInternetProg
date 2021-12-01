@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from django.test import TestCase, Client
-from .models import Post, Category, Tag, Comment
 from django.contrib.auth.models import User
+from .models import Post, Category, Tag, Comment
 
 # Create your tests here.
 class TestView(TestCase):
